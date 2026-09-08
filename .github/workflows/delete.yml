@@ -1,0 +1,36 @@
+# Workflow to delete codemagic.yaml
+# This workflow will automatically delete the codemagic.yaml file
+
+name: Delete codemagic.yaml
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: delete-codemagic-yaml
+      
+      - name: Delete codemagic.yaml
+        run: |
+          if [ -f "codemagic.yaml" ]; then
+            rm codemagic.yaml
+            echo "File deleted successfully"
+          else
+            echo "File does not exist"
+          fi
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Delete codemagic.yaml file" || echo "No changes to commit"
+      
+      - name: Push changes
+        run: |
+          git push origin delete-codemagic-yaml
+          
