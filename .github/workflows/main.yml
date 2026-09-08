@@ -1,0 +1,64 @@
+name: Extract Dadelange ZIP
+on:
+  workflow_dispatch:
+    inputs:
+      zip_path:
+        description: 'Path to zip file relative to repo root'
+        default: 'Dadelange Editor Beta.zip'
+      dest_path:
+        description: 'Destination directory path'
+        default: 'Dadelange Editor Beta'
+      overwrite:
+        description: 'Overwrite existing files (true/false)'
+        default: 'false'
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure unzip is available
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y unzip || true
+
+      - name: Extract ZIP and commit changes
+        env:
+          ZIP_PATH: ${{ github.event.inputs.zip_path }}
+          DEST_PATH: ${{ github.event.inputs.dest_path }}
+          OVERWRITE: ${{ github.event.inputs.overwrite }}
+        run: |
+          set -euo pipefail
+          echo "ZIP_PATH=$ZIP_PATH"
+          if [ ! -f "$ZIP_PATH" ]; then
+            echo "Error: ZIP not found at '$ZIP_PATH'"
+            ls -la
+            exit 1
+          fi
+          mkdir -p "$DEST_PATH"
+          if [ "$OVERWRITE" = "true" ]; then
+            echo "Extracting and overwriting files..."
+            unzip -o "$ZIP_PATH" -d "$DEST_PATH"
+          else
+            echo "Extracting, skipping existing files (no overwrite)..."
+            unzip -n "$ZIP_PATH" -d "$DEST_PATH"
+          fi
+
+          # Commit only if there are changes
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all "$DEST_PATH"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          else
+            git commit -m "Extract $ZIP_PATH into $DEST_PATH (by GitHub Actions)"
+            git push
+          fi
