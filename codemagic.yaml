@@ -1,0 +1,126 @@
+workflows:
+  android-debug:
+    name: ضاد - Android APK (Debug)
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      java: 17
+      vars:
+        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8"
+    scripts:
+      - name: Prepare Android SDK location
+        script: |
+          set -e
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Verify project files
+        script: |
+          set -e
+          ./ci/verify_project.sh
+      - name: Run full JavaScript and production checks
+        script: |
+          set -e
+          ./ci/test_all.sh
+      - name: Build debug APK
+        script: |
+          set -e
+          ./gradlew --no-daemon --stacktrace clean assembleDebug
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
+
+  android-release-apk:
+    name: ضاد - Android Release APK
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      java: 17
+      vars:
+        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8"
+    scripts:
+      - name: Prepare Android SDK location
+        script: |
+          set -e
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Verify project files
+        script: |
+          set -e
+          ./ci/verify_project.sh
+      - name: Run full JavaScript and production checks
+        script: |
+          set -e
+          ./ci/test_all.sh
+      - name: Check release signing secrets
+        script: |
+          set -e
+          test -n "${CM_KEYSTORE_PATH:-}" || { echo "Missing CM_KEYSTORE_PATH"; exit 1; }
+          test -n "${CM_KEYSTORE_PASSWORD:-}" || { echo "Missing CM_KEYSTORE_PASSWORD"; exit 1; }
+          test -n "${CM_KEY_ALIAS:-}" || { echo "Missing CM_KEY_ALIAS"; exit 1; }
+          test -n "${CM_KEY_PASSWORD:-}" || { echo "Missing CM_KEY_PASSWORD"; exit 1; }
+      - name: Build release APK
+        script: |
+          set -e
+          ./gradlew --no-daemon --stacktrace clean assembleRelease
+    artifacts:
+      - app/build/outputs/apk/release/*.apk
+
+  android-release-aab:
+    name: ضاد - Android App Bundle
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      java: 17
+      vars:
+        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8"
+    scripts:
+      - name: Prepare Android SDK location
+        script: |
+          set -e
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Verify project files
+        script: |
+          set -e
+          ./ci/verify_project.sh
+      - name: Run full JavaScript and production checks
+        script: |
+          set -e
+          ./ci/test_all.sh
+      - name: Check release signing secrets
+        script: |
+          set -e
+          test -n "${CM_KEYSTORE_PATH:-}" || { echo "Missing CM_KEYSTORE_PATH"; exit 1; }
+          test -n "${CM_KEYSTORE_PASSWORD:-}" || { echo "Missing CM_KEYSTORE_PASSWORD"; exit 1; }
+          test -n "${CM_KEY_ALIAS:-}" || { echo "Missing CM_KEY_ALIAS"; exit 1; }
+          test -n "${CM_KEY_PASSWORD:-}" || { echo "Missing CM_KEY_PASSWORD"; exit 1; }
+      - name: Build release AAB
+        script: |
+          set -e
+          ./gradlew --no-daemon --stacktrace clean bundleRelease
+    artifacts:
+      - app/build/outputs/bundle/release/*.aab
+
+  android-instrumentation:
+    name: ضاد - Android Instrumentation Smoke Tests
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+      vars:
+        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8"
+    scripts:
+      - name: Prepare Android SDK location
+        script: |
+          set -e
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Verify project files
+        script: |
+          set -e
+          ./ci/verify_project.sh
+      - name: Run full JavaScript and production checks
+        script: |
+          set -e
+          ./ci/test_all.sh
+      - name: Run Android instrumentation tests
+        script: |
+          set -e
+          ./ci/run_android_instrumentation.sh
+    artifacts:
+      - app/build/reports/androidTests/connected/**/*.html
