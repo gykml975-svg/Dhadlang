@@ -1,0 +1,26 @@
+استورد ويب
+استورد تصميم
+
+دالة بطاقة_منتج(اسم, وصف, سعر) {
+    إرجع <مقالة صنف="بطاقة">
+        <عنوان3>{اسم}</عنوان3>
+        <فقرة>{وصف}</فقرة>
+        <قوي>{سعر + " جنيه"}</قوي>
+        <زر صنف="زر">أضف إلى السلة</زر>
+    </مقالة>
+}
+
+خلي بطاقات = <حاوية صنف="شبكة حاوية">
+    {بطاقة_منتج("قهوة عربية", "تحميص متوسط بنكهة متوازنة", "85")}
+    {بطاقة_منتج("تمر فاخر", "تمر سكري مختار بعناية", "60")}
+    {بطاقة_منتج("عسل طبيعي", "عسل جبلي خام", "120")}
+</حاوية>
+
+خلي css = ويب.نمط(تصميم.CSS_أساسي() + ":root{--dhad-primary:#176B57}body{margin:0;background:#f6f7f4;color:#17202A;font-family:system-ui;line-height:1.7}.حاوية{width:min(1100px,92%);margin:auto}.شريط{padding:18px 0}.بطل{padding:70px 0;background:linear-gradient(135deg,#e6f5ef,#fff)}.بطل h1{font-size:clamp(2.2rem,6vw,4.5rem);margin:0 0 12px}.شبكة{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding:36px 0}.بطاقة{background:#fff;border:1px solid #dde5df;border-radius:18px;padding:22px;box-shadow:0 8px 28px rgba(0,0,0,.06)}.بطاقة strong{display:block;font-size:1.35rem;margin:16px 0;color:#176B57}.زر{border:0;border-radius:12px;padding:11px 16px;background:#176B57;color:#fff;font:inherit;cursor:pointer}.تذييل{padding:30px 0;border-top:1px solid #dde5df;margin-top:20px}@media(max-width:760px){.شبكة{grid-template-columns:1fr}}")
+
+خلي الرأس = <ترويسة صنف="شريط"><حاوية صنف="حاوية شريط">متجر ضاد</حاوية></ترويسة>
+خلي البطل = <قسم صنف="بطل"><حاوية صنف="حاوية بطل"><عنوان1>متجر ضاد</عنوان1><فقرة>منتجات عربية مختارة بجودة عالية.</فقرة></حاوية></قسم>
+خلي التذييل = <تذييل صنف="تذييل"><حاوية صنف="حاوية تذييل">© متجر ضاد</حاوية></تذييل>
+
+خلي الصفحة = ويب.صفحة("متجر ضاد", css + ويب.إلى_HTML(الرأس) + ويب.إلى_HTML(البطل) + ويب.إلى_HTML(بطاقات) + ويب.إلى_HTML(التذييل), {لغة: "ar", اتجاه: "rtl"})
+اطبع(الصفحة)

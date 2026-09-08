@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "release": "8.5.9Beta",
+  "name": "مشروعي",
+  "language": "ضاد",
+  "entry": "الرئيسية.ضاد",
+  "files": ["الرئيسية.ضاد"],
+  "runtime": {"maxSteps": 250000, "maxFileBytes": 57671680},
+  "permissions": {"network": "explicit-via-ويب-library", "filesystem": "Storage Access Framework"}
+}

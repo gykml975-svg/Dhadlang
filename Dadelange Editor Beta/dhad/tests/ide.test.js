@@ -1,0 +1,20 @@
+const fs=require('fs'),assert=require('assert');
+const html=fs.readFileSync('app/src/main/assets/index.html','utf8');
+const main=fs.readFileSync('app/src/main/java/org/dhadlang/android/MainActivity.java','utf8');
+assert(html.includes('RECOVERY_KEY'));
+assert(html.includes('renderProjects'));
+assert(html.includes('renameCurrentProject'));
+assert(html.includes('deleteCurrentProject'));
+assert(html.includes('AUTOSAVE_DELAY'));
+assert(main.includes('onSaveInstanceState'));
+assert(main.includes('removeJavascriptInterface'));
+assert(main.includes('setAllowUniversalAccessFromFileURLs(false)'));
+console.log('IDE project management, recovery and Android safety checks: OK');
+
+assert(html.includes('diagnosticsBar'));
+assert(html.includes('prefers-color-scheme:dark'));
+assert(html.includes('saveState'));
+assert(html.includes('data-view="code"'));
+assert(!html.includes('var(--accent)'));
+assert(html.includes('wanted.has(row.project'));
+console.log('UI v3, diagnostics, dark mode and IndexedDB cleanup checks: OK');

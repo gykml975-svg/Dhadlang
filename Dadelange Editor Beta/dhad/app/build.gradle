@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'org.dhadlang.android'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'org.dhadlang.android'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '8.5.9Beta'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            if (System.getenv("CM_KEYSTORE_PATH")) {
+                storeFile file(System.getenv("CM_KEYSTORE_PATH"))
+                storePassword System.getenv("CM_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("CM_KEY_ALIAS")
+                keyPassword System.getenv("CM_KEY_PASSWORD")
+            } else if (project.hasProperty("RELEASE_STORE_FILE")) {
+                storeFile file(project.property("RELEASE_STORE_FILE"))
+                storePassword project.findProperty("RELEASE_STORE_PASSWORD") ?: ""
+                keyAlias project.findProperty("RELEASE_KEY_ALIAS") ?: ""
+                keyPassword project.findProperty("RELEASE_KEY_PASSWORD") ?: ""
+            } else {
+                throw new GradleException("Production release signing is not configured. Set CM_KEYSTORE_PATH/CM_KEYSTORE_PASSWORD/CM_KEY_ALIAS/CM_KEY_PASSWORD or RELEASE_STORE_FILE/RELEASE_STORE_PASSWORD/RELEASE_KEY_ALIAS/RELEASE_KEY_PASSWORD.")
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+        release {
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        animationsDisabled true
+    }
+
+    dependencies {
+        androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+        androidTestImplementation 'androidx.test:runner:1.6.2'
+        androidTestImplementation 'androidx.test:rules:1.6.1'
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    }
+}
